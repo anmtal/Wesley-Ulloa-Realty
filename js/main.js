@@ -81,4 +81,40 @@
       form.reset();
     });
   }
+
+  /* ---- Portfolio lightbox (interactive gallery) ---- */
+  var tiles = [].slice.call(document.querySelectorAll('.port-item.is-clickable'));
+  if (tiles.length) {
+    var ov = document.createElement('div');
+    ov.className = 'lb-overlay';
+    ov.setAttribute('role', 'dialog'); ov.setAttribute('aria-modal', 'true'); ov.setAttribute('aria-label', 'Property image');
+    ov.innerHTML =
+      '<button class="lb-btn lb-close" aria-label="Close">✕</button>' +
+      '<button class="lb-btn lb-prev" aria-label="Previous property">‹</button>' +
+      '<button class="lb-btn lb-next" aria-label="Next property">›</button>' +
+      '<figure class="lb-figure"><img src="data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw==" alt=""><figcaption class="lb-cap"></figcaption></figure>';
+    document.body.appendChild(ov);
+    var lbImg = ov.querySelector('img'), lbCap = ov.querySelector('.lb-cap');
+    var idx = 0, lastFocus = null;
+    function show(i) {
+      idx = (i + tiles.length) % tiles.length;
+      var t = tiles[idx];
+      lbImg.src = t.getAttribute('data-full');
+      lbImg.alt = t.getAttribute('data-place') || '';
+      lbCap.innerHTML = (t.getAttribute('data-place') || '') + '<small>' + (t.getAttribute('data-meta') || '') + '</small>';
+    }
+    function openLb(i) { lastFocus = document.activeElement; show(i); ov.classList.add('open'); document.body.classList.add('nav-open'); ov.querySelector('.lb-close').focus(); }
+    function closeLb() { ov.classList.remove('open'); document.body.classList.remove('nav-open'); if (lastFocus) lastFocus.focus(); }
+    tiles.forEach(function (t, i) { t.addEventListener('click', function () { openLb(i); }); });
+    ov.querySelector('.lb-close').addEventListener('click', closeLb);
+    ov.querySelector('.lb-prev').addEventListener('click', function () { show(idx - 1); });
+    ov.querySelector('.lb-next').addEventListener('click', function () { show(idx + 1); });
+    ov.addEventListener('click', function (e) { if (e.target === ov) closeLb(); });
+    window.addEventListener('keydown', function (e) {
+      if (!ov.classList.contains('open')) return;
+      if (e.key === 'Escape') closeLb();
+      else if (e.key === 'ArrowLeft') show(idx - 1);
+      else if (e.key === 'ArrowRight') show(idx + 1);
+    });
+  }
 })();

@@ -2,3 +2,4 @@ DESIGN.md
 .DS_Store
 Thumbs.db
 assets/_contact_*.jpg
+build_site.py
